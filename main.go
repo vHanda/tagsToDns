@@ -3,14 +3,11 @@ package main
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 )
 
-const (
-	dnsDomain = ".service.consul"
-)
+const dnsDomain = ".service.consul"
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -19,9 +16,7 @@ func main() {
 		switch action {
 		case "member-join":
 		case "member-update":
-			line := scanner.Text()
-			e, err := parse(line)
-
+			e, err := parse(scanner.Text())
 			if err != nil {
 				continue
 			}
@@ -34,9 +29,7 @@ func main() {
 		case "member-failed":
 		case "member-leave":
 		case "member-reap":
-			line := scanner.Text()
-			e, err := parse(line)
-
+			e, err := parse(scanner.Text())
 			if err != nil {
 				continue
 			}
@@ -48,8 +41,6 @@ func main() {
 		default:
 			panic("Invalid serf event: " + action)
 		}
-
-		fmt.Println("Processed:", scanner.Text())
 	}
 }
 
