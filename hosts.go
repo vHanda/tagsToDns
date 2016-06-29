@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const hostFilePath = "/etc/hosts"
+var hostFilePath = os.Getenv("DISCOVERY_HOSTS_FILE_PATH")
 
 // HostsFile is a simple structure for maniputalating the etc hosts file
 type HostsFile struct{}
