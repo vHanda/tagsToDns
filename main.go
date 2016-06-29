@@ -19,7 +19,7 @@ func main() {
 				continue
 			}
 
-			hostsFile := HostsFile{}
+			hostsFile := NewHostsFile()
 			hostsFile.Remove(e.ip)
 			hostsFile.Add(e.ip, addDNSDomain(e.hosts))
 			break
@@ -32,7 +32,7 @@ func main() {
 				continue
 			}
 
-			hostsFile := HostsFile{}
+			hostsFile := NewHostsFile()
 			hostsFile.Remove(e.ip)
 			break
 

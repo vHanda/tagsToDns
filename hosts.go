@@ -7,33 +7,46 @@ import (
 	"strings"
 )
 
-var hostFilePath = os.Getenv("DISCOVERY_HOSTS_FILE_PATH")
-
 // HostsFile is a simple structure for maniputalating the etc hosts file
-type HostsFile struct{}
+type HostsFile struct {
+	filePath string
+}
+
+// NewHostsFile creates a new object
+func NewHostsFile() HostsFile {
+	var h HostsFile
+	h.filePath = os.Getenv("DISCOVERY_HOSTS_FILE_PATH")
+	if h.filePath == "" {
+		h.filePath = "/hosts/hosts.serf"
+	}
+
+	return h
+}
 
 // Add an ip to the hosts file
 func (h HostsFile) Add(ip string, hosts []string) error {
-	file, err := os.OpenFile(hostFilePath, os.O_APPEND|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(h.filePath, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
 	}
 
 	defer file.Close()
 
-	text := ip + " " + strings.Join(hosts, " ") + "\n"
+	fmt.Println(ip, hosts)
+	text := ip + " " + strings.Join(hosts, " ")
+	fmt.Println(text + "FOO")
 	_, err = file.WriteString(text)
 	return err
 }
 
 // Remove an IP from the hosts file
 func (h HostsFile) Remove(ip string) error {
-	contents, err := ioutil.ReadFile(hostFilePath)
+	contents, err := ioutil.ReadFile(h.filePath)
 	if err != nil {
 		panic(err)
 	}
 
-	file, err := os.OpenFile(hostFilePath, os.O_TRUNC|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(h.filePath, os.O_TRUNC|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
 	}
