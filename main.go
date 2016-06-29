@@ -20,29 +20,29 @@ func main() {
 		case "member-join":
 		case "member-update":
 			line := scanner.Text()
-			ip, host, err := fetchIPAndHost(line)
+			e, err := parse(line)
 
 			if err != nil {
 				continue
 			}
 
 			hostsFile := HostsFile{}
-			hostsFile.Remove(ip)
-			hostsFile.Add(ip, host)
+			hostsFile.Remove(e.ip)
+			hostsFile.Add(e.ip, e.host)
 			break
 
 		case "member-failed":
 		case "member-leave":
 		case "member-reap":
 			line := scanner.Text()
-			ip, _, err := fetchIPAndHost(line)
+			e, err := parse(line)
 
 			if err != nil {
 				continue
 			}
 
 			hostsFile := HostsFile{}
-			hostsFile.Remove(ip)
+			hostsFile.Remove(e.ip)
 			break
 
 		default:
@@ -53,21 +53,24 @@ func main() {
 	}
 }
 
+// SerfEvent groups together the information given by serf
+type SerfEvent struct {
+	ip   string
+	host string
+}
+
 // TODO: Handle multiple hosts!
-func fetchIPAndHost(line string) (string, string, error) {
+func parse(line string) (SerfEvent, error) {
 	tagArray := strings.Split(line, "=")
 
 	if len(tagArray) <= 1 {
-		return "", "", errors.New("Invalid tag from serf")
+		return SerfEvent{}, errors.New("Invalid tag from serf")
 	}
 
 	data := strings.Split(tagArray[1], ":")
 	if len(data) <= 2 {
-		return "", "", errors.New("Invalid tag from serf")
+		return SerfEvent{}, errors.New("Invalid tag from serf")
 	}
 
-	ip := data[1]
-	host := data[0]
-
-	return ip, host, nil
+	return SerfEvent{data[1], data[0]}, nil
 }
