@@ -4,13 +4,11 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 )
 
 const (
-	hostsFile = "/etc/hosts"
 	dnsDomain = ".service.consul"
 )
 
@@ -27,8 +25,10 @@ func main() {
 			if err != nil {
 				continue
 			}
-			removeFromHostsFile(ip)
-			addToHostsFile(ip, host+dnsDomain)
+
+			hostsFile := HostsFile{}
+			hostsFile.Remove(ip)
+			hostsFile.Add(ip, host)
 			break
 
 		case "member-failed":
@@ -40,7 +40,9 @@ func main() {
 			if err != nil {
 				continue
 			}
-			removeFromHostsFile(ip)
+
+			hostsFile := HostsFile{}
+			hostsFile.Remove(ip)
 			break
 
 		default:
@@ -68,43 +70,4 @@ func fetchIPAndHost(line string) (string, string, error) {
 	host := data[0]
 
 	return ip, host, nil
-}
-
-func addToHostsFile(ip, hostname string) {
-	file, err := os.OpenFile(hostsFile, os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		panic(err)
-	}
-
-	defer file.Close()
-
-	text := ip + " " + hostname
-	if _, err = file.WriteString(text); err != nil {
-		panic(err)
-	}
-}
-
-// This is shitty. I'm sure it can be simplified far more!
-func removeFromHostsFile(ip string) {
-	contents, err := ioutil.ReadFile(hostsFile)
-	if err != nil {
-		panic(err)
-	}
-
-	file, err := os.OpenFile(hostsFile, os.O_TRUNC|os.O_WRONLY, 0600)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	for _, line := range strings.Split(string(contents), "\n") {
-		if len(line) == 0 {
-			fmt.Fprintln(file)
-			continue
-		}
-
-		if strings.HasPrefix(line, "#") || !strings.HasPrefix(line, ip) {
-			fmt.Fprintln(file, line)
-		}
-	}
 }
