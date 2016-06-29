@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+const (
+	hostsFile = "/etc/hosts"
+	dnsDomain = ".service.consul"
+)
+
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
@@ -23,7 +28,7 @@ func main() {
 				continue
 			}
 			removeFromHostsFile(ip)
-			addToHostsFile(ip, host+".service.consul")
+			addToHostsFile(ip, host+dnsDomain)
 			break
 
 		case "member-failed":
@@ -66,8 +71,7 @@ func fetchIPAndHost(line string) (string, string, error) {
 }
 
 func addToHostsFile(ip, hostname string) {
-	filePath := "/tmp/hosts"
-	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(hostsFile, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		panic(err)
 	}
@@ -82,14 +86,12 @@ func addToHostsFile(ip, hostname string) {
 
 // This is shitty. I'm sure it can be simplified far more!
 func removeFromHostsFile(ip string) {
-	filePath := "/tmp/hosts"
-
-	contents, err := ioutil.ReadFile(filePath)
+	contents, err := ioutil.ReadFile(hostsFile)
 	if err != nil {
 		panic(err)
 	}
 
-	file, err := os.OpenFile(filePath, os.O_TRUNC|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(hostsFile, os.O_TRUNC|os.O_WRONLY, 0600)
 	if err != nil {
 		panic(err)
 	}
