@@ -1,0 +1,15 @@
+member-join c6191a8a35f2   172.17.2.10             c6191a8a35f2=redis:172.17.2.10:0
+member-join 423679f972dc   172.17.2.2              423679f972dc=elasticSearch:172.17.2.2:0
+member-join 5949fd9fbff9   172.17.2.19
+member-join 07d3eeeace96   172.17.2.3
+member-join f643266aae35   172.17.1.255
+member-join 37d2b937090d   172.17.2.11
+member-join ab05819e2509   172.17.2.7
+member-join 18cb789d7242   172.17.2.0
+member-join d2883e109392   172.17.2.12
+member-join 94d41cc2b621   172.17.2.14
+member-join 4a39979e223e   172.17.2.9
+member-join 164c03f17e74   172.17.2.8
+member-join c0d02ee26ecc   172.17.2.16
+member-join 04cc2e8c9e88   172.17.2.17
+member-join 8ef558117e1a   172.17.2.20

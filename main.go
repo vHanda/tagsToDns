@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -16,8 +17,11 @@ func main() {
 		case "member-join":
 		case "member-update":
 			line := scanner.Text()
-			ip, host := fetchIPAndHost(line)
+			ip, host, err := fetchIPAndHost(line)
 
+			if err != nil {
+				continue
+			}
 			removeFromHostsFile(ip)
 			addToHostsFile(ip, host+".service.consul")
 			break
@@ -26,8 +30,11 @@ func main() {
 		case "member-leave":
 		case "member-reap":
 			line := scanner.Text()
-			ip, _ := fetchIPAndHost(line)
+			ip, _, err := fetchIPAndHost(line)
 
+			if err != nil {
+				continue
+			}
 			removeFromHostsFile(ip)
 			break
 
@@ -40,22 +47,22 @@ func main() {
 }
 
 // TODO: Handle multiple hosts!
-func fetchIPAndHost(line string) (string, string) {
+func fetchIPAndHost(line string) (string, string, error) {
 	tagArray := strings.Split(line, "=")
 
 	if len(tagArray) <= 1 {
-		panic("Recevied an invalid tag from serf: " + line)
+		return "", "", errors.New("Invalid tag from serf")
 	}
 
 	data := strings.Split(tagArray[1], ":")
 	if len(data) <= 2 {
-		panic("Recevied an invalid tag from serf: " + line)
+		return "", "", errors.New("Invalid tag from serf")
 	}
 
 	ip := data[1]
 	host := data[0]
 
-	return ip, host
+	return ip, host, nil
 }
 
 func addToHostsFile(ip, hostname string) {
