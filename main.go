@@ -45,22 +45,34 @@ func main() {
 // SerfEvent groups together the information given by serf
 type SerfEvent struct {
 	ip    string
+	id    string
 	hosts []string
 }
 
 func parse(line string) (SerfEvent, error) {
-	tagArray := strings.Split(line, "=")
+	var event SerfEvent
 
-	if len(tagArray) <= 1 {
-		return SerfEvent{}, errors.New("Invalid tag from serf")
+	tags := strings.Split(line, ",")
+	for _, tag := range tags {
+		tagArray := strings.Split(tag, "=")
+
+		if len(tagArray) <= 1 {
+			return SerfEvent{}, errors.New("Invalid tag from serf")
+		}
+
+		data := strings.Split(tagArray[1], ":")
+		if len(data) <= 2 {
+			return SerfEvent{}, errors.New("Invalid tag from serf")
+		}
+
+		// The IP and id are being overwritten when there is more than 1
+		// but in practice they are the same, so it doesn't matter
+		event.ip = data[1]
+		event.id = tagArray[0]
+		event.hosts = append(event.hosts, data[0])
 	}
 
-	data := strings.Split(tagArray[1], ":")
-	if len(data) <= 2 {
-		return SerfEvent{}, errors.New("Invalid tag from serf")
-	}
-
-	return SerfEvent{data[1], strings.Split(data[0], ",")}, nil
+	return event, nil
 }
 
 func addDNSDomain(hosts []string) []string {
