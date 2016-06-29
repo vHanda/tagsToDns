@@ -13,7 +13,7 @@ const hostFilePath = "/etc/hosts"
 type HostsFile struct{}
 
 // Add an ip to the hosts file
-func (h HostsFile) Add(ip string, hostname string) error {
+func (h HostsFile) Add(ip string, hosts []string) error {
 	file, err := os.OpenFile(hostFilePath, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func (h HostsFile) Add(ip string, hostname string) error {
 
 	defer file.Close()
 
-	text := ip + " " + hostname + "\n"
+	text := ip + " " + strings.Join(hosts, " ") + "\n"
 	_, err = file.WriteString(text)
 	return err
 }

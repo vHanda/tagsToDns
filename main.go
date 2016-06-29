@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-const dnsDomain = ".service.consul"
-
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
@@ -23,7 +21,7 @@ func main() {
 
 			hostsFile := HostsFile{}
 			hostsFile.Remove(e.ip)
-			hostsFile.Add(e.ip, e.host)
+			hostsFile.Add(e.ip, addDNSDomain(e.hosts))
 			break
 
 		case "member-failed":
@@ -46,11 +44,10 @@ func main() {
 
 // SerfEvent groups together the information given by serf
 type SerfEvent struct {
-	ip   string
-	host string
+	ip    string
+	hosts []string
 }
 
-// TODO: Handle multiple hosts!
 func parse(line string) (SerfEvent, error) {
 	tagArray := strings.Split(line, "=")
 
@@ -63,5 +60,15 @@ func parse(line string) (SerfEvent, error) {
 		return SerfEvent{}, errors.New("Invalid tag from serf")
 	}
 
-	return SerfEvent{data[1], data[0]}, nil
+	return SerfEvent{data[1], strings.Split(data[0], ",")}, nil
+}
+
+func addDNSDomain(hosts []string) []string {
+	const dnsDomain = ".service.consul"
+
+	domains := make([]string, len(hosts))
+	for i, v := range hosts {
+		domains[i] = v + dnsDomain
+	}
+	return domains
 }
