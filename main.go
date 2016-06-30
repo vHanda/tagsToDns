@@ -12,9 +12,7 @@ func main() {
 	for scanner.Scan() {
 		action := os.Getenv("SERF_EVENT")
 		switch action {
-		case "member-join":
-			fallthrough
-		case "member-update":
+		case "member-join", "member-update":
 			e, err := parse(scanner.Text())
 			if err != nil {
 				continue
@@ -24,11 +22,7 @@ func main() {
 			hostsFile.Remove(e.ip)
 			hostsFile.Add(e.ip, addDNSDomain(e.hosts))
 
-		case "member-failed":
-			fallthrough
-		case "member-leave":
-			fallthrough
-		case "member-reap":
+		case "member-failed", "member-leave", "member-reap":
 			e, err := parse(scanner.Text())
 			if err != nil {
 				continue
@@ -36,7 +30,6 @@ func main() {
 
 			hostsFile := NewHostsFile()
 			hostsFile.Remove(e.ip)
-			break
 
 		default:
 			panic("Invalid serf event: " + action)
