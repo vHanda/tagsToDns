@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -18,6 +19,11 @@ func NewHostsFile() HostsFile {
 	h.filePath = os.Getenv("DISCOVERY_HOSTS_FILE_PATH")
 	if h.filePath == "" {
 		h.filePath = "/hosts/hosts.serf"
+	}
+
+	err := os.MkdirAll(filepath.Dir(h.filePath), 0777)
+	if err != nil {
+		panic("Failed to create DISCOVERY_HOSTS_FILE_PATH directory")
 	}
 
 	return h
