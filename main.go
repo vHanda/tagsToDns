@@ -13,6 +13,7 @@ func main() {
 		action := os.Getenv("SERF_EVENT")
 		switch action {
 		case "member-join":
+			fallthrough
 		case "member-update":
 			e, err := parse(scanner.Text())
 			if err != nil {
@@ -22,10 +23,11 @@ func main() {
 			hostsFile := NewHostsFile()
 			hostsFile.Remove(e.ip)
 			hostsFile.Add(e.ip, addDNSDomain(e.hosts))
-			break
 
 		case "member-failed":
+			fallthrough
 		case "member-leave":
+			fallthrough
 		case "member-reap":
 			e, err := parse(scanner.Text())
 			if err != nil {
