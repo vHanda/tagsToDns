@@ -38,7 +38,7 @@ func (h HostsFile) Add(ip string, hosts []string) error {
 
 	defer file.Close()
 
-	text := ip + " " + strings.Join(hosts, " ")
+	text := ip + " " + strings.Join(hosts, " ") + "\n"
 	_, err = file.WriteString(text)
 	return err
 }
